@@ -1,14 +1,9 @@
 package edu.uchicago.lib.OLEIngest;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+//TODO: handle XML declaration, copy from input to output. 
+//      Try to set up declaration-handler
+//      See http://www.saxproject.org/apidoc/org/xml/sax/package-summary.html
+
 import java.io.PrintStream;
 
 import javax.xml.parsers.SAXParser;
@@ -21,6 +16,12 @@ public class OLEImportHandler extends DefaultHandler {
 
 	private PrintStream out = System.out;
 	private PrintStream err = System.err;
+	
+	private String collectionEltName = "instanceCollection";
+	private String collectionOpenTag = null;
+	private String collectionCloseTag = null;
+	
+	private String docEltName = "instance";
 	
 	public OLEImportHandler(PrintStream out,PrintStream err) {
 		this.out = out;
@@ -50,14 +51,40 @@ public class OLEImportHandler extends DefaultHandler {
 		openTagBuf.append(">");
 		String openTag = openTagBuf.toString();
 		
-		this.out.print(openTag);
+		if (false){
+			this.out.println("localName\t= " + localName);
+			this.out.println("qName\t= " + qName);
+			this.out.println("collectionEltName = " + this.collectionEltName);
+		}
+		
+		if (localName == this.collectionEltName) {
+			this.collectionOpenTag = openTag;
+			this.collectionCloseTag = "</"+qName+">";
+		} 
+		else if (localName == this.docEltName) {
+			this.out.print("<ingestDocument id='0' category='work' type='instance' format='oleml'><content><![CDATA[");
+			this.out.print(this.collectionOpenTag);
+			this.out.print(openTag);
+		}
+		else {
+			this.out.print(openTag);
+		}		
 	}
 
 	public void endElement(String uri, String localName,
 			String qName) throws SAXException {
-
-		this.out.print("</" + qName + ">");
-
+		String closeTag = "</" + qName + ">";
+		if (localName == this.collectionEltName) {
+			// no-op (for now)
+		}
+		else if (localName == this.docEltName) {
+			this.out.print(closeTag);
+			this.out.print(this.collectionCloseTag);
+			this.out.print("]]></content></ingestDocument>\n");
+		}
+		else {
+			this.out.print(closeTag);
+		}
 	}
 
 	public void characters(char ch[], int start, int length) throws SAXException {

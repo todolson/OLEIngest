@@ -15,10 +15,16 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
  
 class OLEWrapper {
+	
+	static String SaxNSURI = "http://xml.org/sax/features/namespaces";
+	
 	public static void main(String args[]) {
 		// Printing arguments just to show them
-		for (int i = 0; i < args.length; i++) {
-			System.out.printf("arg[%d]: %s\n", i, args[i]);
+		boolean debug = false;
+		if (debug) {
+			for (int i = 0; i < args.length; i++) {
+				System.err.printf("arg[%d]: %s\n", i, args[i]);
+			}
 		}
 		
 		// Now the real program
@@ -44,10 +50,17 @@ class OLEWrapper {
 		// Then do the work...
 		
 		SAXParserFactory factory = SAXParserFactory.newInstance();
+		factory.setNamespaceAware(true);
 		try {
 			SAXParser saxParser = factory.newSAXParser();
 			 DefaultHandler handler = new OLEImportHandler(out, err);
 			 XMLReader reader = saxParser.getXMLReader();
+			 if (debug) {
+				 out.println("factory.isNamespaceAware()=" + factory.isNamespaceAware());
+				 out.println("saxParser.isNamespaceAware()=" + saxParser.isNamespaceAware());
+				 out.println(SaxNSURI + "=" + reader.getFeature(SaxNSURI));
+				 System.exit(0);
+			 }
 			 reader.setContentHandler(handler);
 			 reader.parse(new InputSource(in));
 		} catch (IOException e) {
