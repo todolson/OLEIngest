@@ -8,7 +8,9 @@ import java.io.PrintStream;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.Locator;
 import org.xml.sax.ext.DefaultHandler2;
+import org.xml.sax.ext.Locator2;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class OLEImportHandler extends DefaultHandler2 {
@@ -16,11 +18,17 @@ public class OLEImportHandler extends DefaultHandler2 {
 	private PrintStream out = System.out;
 	private PrintStream err = System.err;
 	
+	private Locator locator = null;
+	private Locator2 locator2 = null;
+	
 	private String collectionEltName = "instanceCollection";
 	private String collectionOpenTag = null;
 	private String collectionCloseTag = null;
 	
 	private String docEltName = "instance";
+	
+	// Track how many levels deep we are in the input document
+	private int eltLevel = 0;
 	
 	public OLEImportHandler(PrintStream out,PrintStream err) {
 		this.out = out;
@@ -35,8 +43,18 @@ public class OLEImportHandler extends DefaultHandler2 {
 		this.out = err;
 	}
 	
+	public void setDocumentLocator(Locator locator) {
+		this.locator = locator;
+		this.err.println("locator type = " + locator.getClass().toString());
+		for (Class c : locator.getClass().getInterfaces()) {
+			if (c.toString()=="org.xml.sax.ext.Locator2") {
+				locator2 = (Locator2) locator;
+			}
+		}
+	}
+	
 	public void startElement(String uri, String localName,String qName, Attributes attr) throws SAXException {
-
+		this.eltLevel++;
 		StringBuffer openTagBuf = new StringBuffer();
 		
 		openTagBuf.append("<").append(qName);
@@ -61,7 +79,8 @@ public class OLEImportHandler extends DefaultHandler2 {
 			this.collectionCloseTag = "</"+qName+">";
 		} 
 		else if (localName == this.docEltName) {
-			this.out.print("<ingestDocument id='0' category='work' type='instance' format='oleml'><content><![CDATA[");
+			this.out.print("<ingestDocument id='0' category='work' type='instance' format='oleml'>");
+			this.out.print("\n<content><![CDATA[");
 			this.out.print(this.collectionOpenTag);
 			this.out.print(openTag);
 		}
@@ -84,6 +103,7 @@ public class OLEImportHandler extends DefaultHandler2 {
 		else {
 			this.out.print(closeTag);
 		}
+		this.eltLevel--;
 	}
 
 	public void characters(char ch[], int start, int length) throws SAXException {
@@ -100,6 +120,10 @@ public class OLEImportHandler extends DefaultHandler2 {
 		this.out.print("<!-- ");
 		this.out.print(comment);
 		this.out.print(" -->");
+		// Add a newline only if we are not inside any element content
+		if (this.eltLevel == 0) {
+			this.out.println();
+		}
 	}
 		 
 }
