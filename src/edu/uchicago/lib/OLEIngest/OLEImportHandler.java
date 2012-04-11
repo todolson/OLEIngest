@@ -6,13 +6,12 @@ package edu.uchicago.lib.OLEIngest;
 
 import java.io.PrintStream;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.ext.DefaultHandler2;
+import org.xml.sax.helpers.DefaultHandler;
 
-public class OLEImportHandler extends DefaultHandler {
+public class OLEImportHandler extends DefaultHandler2 {
 
 	private PrintStream out = System.out;
 	private PrintStream err = System.err;
@@ -91,6 +90,16 @@ public class OLEImportHandler extends DefaultHandler {
 
 		this.out.print(new String(ch,start,length));
 
+	}
+	
+	// Does our SAX implementation support comment()?
+	// Must register a lexical handler with the XMLReader,
+	// see http://www.saxproject.org/apidoc/org/xml/sax/ext/LexicalHandler.html
+	public void comment(char[] ch, int start, int length) {
+		String comment = new String(ch, start, length);
+		this.out.print("<!-- ");
+		this.out.print(comment);
+		this.out.print(" -->");
 	}
 		 
 }

@@ -17,6 +17,7 @@ import org.xml.sax.helpers.DefaultHandler;
 class OLEWrapper {
 	
 	static String SaxNSURI = "http://xml.org/sax/features/namespaces";
+	static String SaxLexHandlerURI = "http://xml.org/sax/properties/lexical-handler";
 	
 	public static void main(String args[]) {
 		// Printing arguments just to show them
@@ -62,6 +63,8 @@ class OLEWrapper {
 				 System.exit(0);
 			 }
 			 reader.setContentHandler(handler);
+			 // Register lexical handler for comment processing
+			 reader.setProperty(SaxLexHandlerURI, handler);
 			 reader.parse(new InputSource(in));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
