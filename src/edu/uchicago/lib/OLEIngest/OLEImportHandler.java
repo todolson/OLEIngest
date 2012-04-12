@@ -8,6 +8,17 @@ import org.xml.sax.Locator;
 import org.xml.sax.ext.DefaultHandler2;
 import org.xml.sax.ext.Locator2;
 
+
+/**
+ * SAX2 handler for OLE ingest documents
+ * 
+ * Handler to generate a JCR ingest request document from an OLE input collection
+ * Breaks apart the input document into single-document collections for ingest into the OLE document store 
+ * Used for both the <code>ContentHandler</code> and the lexical handler. 
+ * 
+ * @author tod
+ *
+ */
 public class OLEImportHandler extends DefaultHandler2 {
 
 	private PrintStream out = System.out;
@@ -26,23 +37,41 @@ public class OLEImportHandler extends DefaultHandler2 {
 	// Track how many levels deep we are in the input document
 	private int eltLevel = 0;
 	
+	public OLEImportHandler() { }
+	
 	public OLEImportHandler(PrintStream out,PrintStream err) {
 		this.out = out;
 		this.err = err;
 	}
 	
+	/**
+	 * Set output stream for XML output.
+	 * @param out
+	 */
 	public void setOut(PrintStream out){
 		this.out = out;
 	}
 	
+	/**
+	 * Set error stream for XML output.
+	 * @param err
+	 */
 	public void setErr(PrintStream err){
 		this.out = err;
 	}
 	
+	/**
+	 * Return user that would be listed in the generated <code>request</code> document
+	 * @return
+	 */
 	public String getUser() {
 		return this.user;
 	}
 	
+	/**
+	 * Set user to be inserted in the output <code>request</code> document
+	 * @param user
+	 */
 	public void setUser(String user) {
 		this.user = user;
 	}
