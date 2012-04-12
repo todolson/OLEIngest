@@ -18,8 +18,7 @@ public class OLEImportHandler extends DefaultHandler2 {
 	private PrintStream out = System.out;
 	private PrintStream err = System.err;
 	
-	private Locator locator = null;
-	private Locator2 locator2 = null;
+	private Locator2 locator = null;
 	
 	private String collectionEltName = "instanceCollection";
 	private String collectionOpenTag = null;
@@ -44,16 +43,33 @@ public class OLEImportHandler extends DefaultHandler2 {
 	}
 	
 	public void setDocumentLocator(Locator locator) {
-		this.locator = locator;
-		this.err.println("locator type = " + locator.getClass().toString());
-		for (Class c : locator.getClass().getInterfaces()) {
-			if (c.toString()=="org.xml.sax.ext.Locator2") {
-				locator2 = (Locator2) locator;
+		for (Class<?> c : locator.getClass().getInterfaces()) {
+			if (c.getName() == "org.xml.sax.ext.Locator2") {
+				this.locator = (Locator2) locator;
 			}
 		}
+		if (this.locator == null) {
+			this.err.println("locator object does not support Locator2 interface");
+		}
+		System.exit(0);
 	}
 	
-	public void startElement(String uri, String localName,String qName, Attributes attr) throws SAXException {
+	public void startDocument()
+            throws SAXException {
+		StringBuffer decl = new StringBuffer();
+		decl.append("<?xml");
+		if (this.locator != null) {
+			decl.append(" version='").append(this.locator.getXMLVersion()).append("'");
+			decl.append(" encoding='").append(this.locator.getEncoding()).append("'");
+		} else {
+			decl.append(" version='1.0'");
+		}
+		decl.append("?>");
+		this.out.println(decl);
+	}
+	
+	public void startElement(String uri, String localName,String qName, Attributes attr) 
+			throws SAXException {
 		this.eltLevel++;
 		StringBuffer openTagBuf = new StringBuffer();
 		
