@@ -1,9 +1,5 @@
 package edu.uchicago.lib.OLEIngest;
 
-//TODO: handle XML declaration, copy from input to output. 
-//      Try to set up declaration-handler
-//      See http://www.saxproject.org/apidoc/org/xml/sax/package-summary.html
-
 import java.io.PrintStream;
 
 import org.xml.sax.Attributes;
@@ -11,7 +7,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.Locator;
 import org.xml.sax.ext.DefaultHandler2;
 import org.xml.sax.ext.Locator2;
-import org.xml.sax.helpers.DefaultHandler;
 
 public class OLEImportHandler extends DefaultHandler2 {
 
@@ -83,13 +78,7 @@ public class OLEImportHandler extends DefaultHandler2 {
 		}
 		openTagBuf.append(">");
 		String openTag = openTagBuf.toString();
-		
-		if (false){
-			this.out.println("localName\t= " + localName);
-			this.out.println("qName\t= " + qName);
-			this.out.println("collectionEltName = " + this.collectionEltName);
-		}
-		
+				
 		if (localName == this.collectionEltName) {
 			this.collectionOpenTag = openTag;
 			this.collectionCloseTag = "</"+qName+">";
@@ -123,9 +112,7 @@ public class OLEImportHandler extends DefaultHandler2 {
 	}
 
 	public void characters(char ch[], int start, int length) throws SAXException {
-
 		this.out.print(new String(ch,start,length));
-
 	}
 	
 	// Does our SAX implementation support comment()?
@@ -140,6 +127,5 @@ public class OLEImportHandler extends DefaultHandler2 {
 		if (this.eltLevel == 0) {
 			this.out.println();
 		}
-	}
-		 
+	} 
 }
