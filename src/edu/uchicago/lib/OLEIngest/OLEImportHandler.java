@@ -46,7 +46,6 @@ public class OLEImportHandler extends DefaultHandler2 {
 		if (this.locator == null) {
 			this.err.println("locator object does not support Locator2 interface");
 		}
-		System.exit(0);
 	}
 	
 	public void startDocument()
@@ -84,6 +83,7 @@ public class OLEImportHandler extends DefaultHandler2 {
 			this.collectionCloseTag = "</"+qName+">";
 		} 
 		else if (localName == this.docEltName) {
+			// TODO: increment id so it is unique for each document
 			this.out.print("<ingestDocument id='0' category='work' type='instance' format='oleml'>");
 			this.out.print("\n<content><![CDATA[");
 			this.out.print(this.collectionOpenTag);
