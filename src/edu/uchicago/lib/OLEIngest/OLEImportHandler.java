@@ -81,6 +81,11 @@ public class OLEImportHandler extends DefaultHandler2 {
 		if (localName == this.collectionEltName) {
 			this.collectionOpenTag = openTag;
 			this.collectionCloseTag = "</"+qName+">";
+			
+			this.out.println("<request>");
+			this.out.println("<user>Tod</user>");
+			this.out.println("<operation>batchIngest</operation>");
+			this.out.println("<requestDocuments>");
 		} 
 		else if (localName == this.docEltName) {
 			// TODO: increment id so it is unique for each document
@@ -98,7 +103,8 @@ public class OLEImportHandler extends DefaultHandler2 {
 			String qName) throws SAXException {
 		String closeTag = "</" + qName + ">";
 		if (localName == this.collectionEltName) {
-			// no-op (for now)
+			this.out.println("</requestDocuments>");
+			this.out.println("</request>");
 		}
 		else if (localName == this.docEltName) {
 			this.out.print(closeTag);
