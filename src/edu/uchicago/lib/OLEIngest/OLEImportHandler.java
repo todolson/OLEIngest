@@ -12,6 +12,8 @@ public class OLEImportHandler extends DefaultHandler2 {
 
 	private PrintStream out = System.out;
 	private PrintStream err = System.err;
+	private String user = System.getProperty("user.name");
+	private int docCounter = 0;
 	
 	private Locator2 locator = null;
 	
@@ -35,6 +37,14 @@ public class OLEImportHandler extends DefaultHandler2 {
 	
 	public void setErr(PrintStream err){
 		this.out = err;
+	}
+	
+	public String getUser() {
+		return this.user;
+	}
+	
+	public void setUser(String user) {
+		this.user = user;
 	}
 	
 	public void setDocumentLocator(Locator locator) {
@@ -83,16 +93,20 @@ public class OLEImportHandler extends DefaultHandler2 {
 			this.collectionCloseTag = "</"+qName+">";
 			
 			this.out.println("<request>");
-			this.out.println("<user>Tod</user>");
+			this.out.println("<user>" + this.user + "</user>");
 			this.out.println("<operation>batchIngest</operation>");
 			this.out.println("<requestDocuments>");
 		} 
 		else if (localName == this.docEltName) {
 			// TODO: increment id so it is unique for each document
-			this.out.print("<ingestDocument id='0' category='work' type='instance' format='oleml'>");
+			this.out.print("<ingestDocument id='");
+			this.out.print(this.docCounter);
+			this.out.print("' category='work' type='instance' format='oleml'>");
 			this.out.print("\n<content><![CDATA[");
 			this.out.print(this.collectionOpenTag);
 			this.out.print(openTag);
+			
+			this.docCounter++;
 		}
 		else {
 			this.out.print(openTag);
